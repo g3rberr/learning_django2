@@ -10,25 +10,33 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 import sys
-
+import environ
+import os
 from pathlib import Path
+
+env = environ.Env(
+    DEBUG=(bool),
+    EMAIL_USE_SSL=(bool),
+
+)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-qlw05vrtxvg+v9_tdyfhb7!vka&tn8#+te$a&5*_qml#12al6z'
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env('DEBUG')
 
 ALLOWED_HOSTS = ['*']
 
-DOMAIN_NAME = 'http://localhost:8000'
+DOMAIN_NAME = env('DOMAIN_NAME')
 
 # Application definition
 
@@ -94,11 +102,15 @@ INTERNAL_IPS = [
     'localhost',
 ]
 
+# Redis 
+
+REDIS_HOST = env('REDIS_HOST')
+REDIS_PORT = env('REDIS_PORT')
 
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379/0",
+        "LOCATION": f"redis://{REDIS_HOST}:{REDIS_PORT}/0",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
@@ -114,11 +126,11 @@ CACHES = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'store1_db',
-        'USER': 'store1_username',
-        'PASSWORD': 'store_password',
-        'HOST':  'localhost',
-        'PORT': '5432'
+        'NAME': env('DATABASE_NAME'),
+        'USER': env('DATABASE_USER'),
+        'PASSWORD': env('DATABASE_PASSWORD'),
+        'HOST':  env('DATABASE_HOST'),
+        'PORT': env('DATABASE_PORT'),
     }
 }
 
@@ -183,12 +195,14 @@ LOGOUT_REDIRECT_URL = 'index'
 
 # Sending emails
 
-EMAIL_HOST = 'smtp.yandex.com'
-EMAIL_PORT = 465
-EMAIL_HOST_USER = 'ronaldoalmeyda@ya.ru'
-EMAIL_HOST_PASSWORD = 'yxinmtqcohjarcyb'
-EMAIL_USE_SSL = True
-# EMAIL_BACKEND = 'django.core.mail.bakcend.console.EmailBackend'
+if DEBUG:
+    EMAIL_BACKEND = 'django.core.mail.bakcend.console.EmailBackend'
+else:
+    EMAIL_HOST = env('EMAIL_HOST')
+    EMAIL_PORT = int(env('EMAIL_PORT'))
+    EMAIL_HOST_USER = env('EMAIL_HOST_USER')
+    EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
+    EMAIL_USE_SSL = env('EMAIL_USE_SSL')
 
 
 # OAuth
@@ -217,17 +231,17 @@ SOCIALACCOUNT_PROVIDERS = {
 
 # Celery
 
-CELERY_BROKER_URL = 'redis://127.0.0.1:6379/0'
-CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379/0'
+CELERY_BROKER_URL = f'redis://{REDIS_HOST}:{REDIS_PORT}/0'
+CELERY_RESULT_BACKEND = f'redis://{REDIS_HOST}:{REDIS_PORT}/0'
 
 
-CELERY_TASK_ALWAYS_EAGER = "test" in sys.argv
+# CELERY_TASK_ALWAYS_EAGER = "test" in sys.argv
 
 # Stripe
 
-STRIPE_SECRET_KEY = 'sk_test_51R9tnNPvnNHh3SIebfoiCGx8S0VDAeeljSBD7nWhYFmUfmvvMhp3QzL0VN6hsJfysKfnoP20uYwuJ3wEMMlTUhor00dOC0QVll'
-STRIPE_PUBLIC_KEY = 'pk_test_51R9tnNPvnNHh3SIegwYU6tgdzGl9hoCXExk4QHlsS7CEnq1c3jOGjpoyGfpZAVaRw3kAz9jRHkk6jGwmFBWc5Mrj00eC4QQNeG'
-STRIPE_WEBHOOK_SECRET = 'whsec_d290d368c55d97777d48108f378353058ea8afbbeecc2f6d74b049adae37e597'
+STRIPE_SECRET_KEY = env('STRIPE_SECRET_KEY')
+STRIPE_PUBLIC_KEY = env('STRIPE_PUBLIC_KEY')
+STRIPE_WEBHOOK_SECRET = env('STRIPE_WEBHOOK_SECRET')
 
 # nobly-holy-upbeat-exalt
 
