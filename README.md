@@ -36,9 +36,9 @@ This project is a hands‑on exercise in Django fundamentals, covering template 
 
 ## Tech Stack
 
-- **Backend**: Django 2.x  
+- **Backend**: Django 5.x  
 - **Frontend**: HTML5, CSS3, JavaScript  
-- **Database**: SQLite (default)  
+- **Database**: PostgreSQL
 - **Payments**: Stripe API  
 - **Authentication**: Django’s built‑in auth + `django-allauth` (for OAuth)  
 - **Testing**: Django’s `TestCase` framework  
